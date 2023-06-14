@@ -4,6 +4,7 @@ const PORT = process.env.PORT || 4444;
 const app = express();
 const api = require("./db/db.json");
 const fs = require("fs");
+const { log } = require("console");
 
 
 app.use(express.json());
@@ -23,11 +24,23 @@ app.get('/api/notes', (req, res) => {
 });
 
 app.post('/api/notes', (req, res) => {
-   let savedNotes = req.body;
-   console.log(savedNotes);
-   const updatedApi = [...api, savedNotes];
-   fs.writeFile("./db/db.json", JSON.stringify(updatedApi), (err) =>
-   err ? console.error(err) : res.json("nice! note is here maybe?"));
+    let pastNotes = JSON.parse(fs.readFileSync("./db/db.json", (err, data) => {
+        if (err) throw err;
+        // console.log(data);
+    }))
+    console.log(pastNotes + "look at this");
+    let { title, text } = req.body;
+    // console.log(req.body)
+    const updatedApi = {
+        title: title,
+        text: text
+    }
+    let testArray = [];
+    testArray.push(updatedApi)
+    console.log(testArray);
+    fs.writeFile("./db/db.json", JSON.stringify(testArray), (err) =>
+        err ? console.error(err) : console.log("Nice! note saved"));
+    res.json(updatedApi);
 });
 
 app.listen(PORT, () =>

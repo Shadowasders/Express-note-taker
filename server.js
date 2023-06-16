@@ -47,6 +47,14 @@ app.post('/api/notes', (req, res) => {
     res.json(updatedApi);
 });
 
+app.delete('/api/notes/:id', (req, res) => {
+    let noteList = JSON.parse(fs.readFileSync("./db/db.json"))
+    let newList = noteList.filter(note => note.id !== req.params.id)
+    console.log(newList)
+    fs.writeFileSync("./db/db.json", JSON.stringify(newList))
+    res.json(newList)
+})
+
 app.listen(PORT, () =>
     console.log(`app listening at http://localhost:${PORT}`)
 )

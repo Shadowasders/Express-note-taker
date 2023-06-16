@@ -5,6 +5,9 @@ const app = express();
 const api = require("./db/db.json");
 const fs = require("fs");
 const { log } = require("console");
+const { v4: uuidv4 } = require("uuid");
+const uuid = uuidv4();
+
 
 
 app.use(express.json());
@@ -20,25 +23,26 @@ app.get('/notes', (req, res) => {
 });
 
 app.get('/api/notes', (req, res) => {
-    res.json(api)
+    const notes = readNotes()
+    res.json(notes)
 });
 
+
+function readNotes() {
+    return JSON.parse(fs.readFileSync("./db/db.json"))
+};  
+
+
 app.post('/api/notes', (req, res) => {
-    let pastNotes = JSON.parse(fs.readFileSync("./db/db.json", (err, data) => {
-        if (err) throw err;
-        // console.log(data);
-    }))
-    console.log(pastNotes + "look at this");
+    const oldNotes = readNotes()
     let { title, text } = req.body;
-    // console.log(req.body)
     const updatedApi = {
         title: title,
-        text: text
+        text: text,
+        id: uuid
     }
-    let testArray = [];
-    testArray.push(updatedApi)
-    console.log(testArray);
-    fs.writeFile("./db/db.json", JSON.stringify(testArray), (err) =>
+    oldNotes.push(updatedApi);
+    fs.writeFile("./db/db.json", JSON.stringify(oldNotes), (err) =>
         err ? console.error(err) : console.log("Nice! note saved"));
     res.json(updatedApi);
 });
